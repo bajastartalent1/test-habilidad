@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test de Habilidad Laboral</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f8f8f8;
+      color: #333;
+    }
+    h1 {
+      color: #222;
+    }
+    .question {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    button {
+      display: block;
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+    }
+    button:hover {
+      background-color: #e0e0e0;
+    }
+    .selected {
+      background-color: #d0eaff;
+      font-weight: bold;
+    }
+    #result {
+      font-size: 1.3em;
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #e6ffe6;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 TEST: ¿Cuál es tu habilidad laboral más fuerte?</h1>
+  <p>Responde estas 10 preguntas y suma los puntos. Al final, podrás saber cuál es tu mayor fortaleza hoy (¡y en qué podrías mejorar!).</p>
+
+  <div id="quiz"></div>
+
+  <button onclick="showResult()">Ver resultado</button>
+
+  <div id="result"></div>
+
+  <script>
+    const questions = [
+      {
+        text: "1. Si ocurre un cambio inesperado en tu trabajo, tú…",
+        options: [
+          { text: "a) Me bloqueo y me cuesta adaptarme.", score: 1 },
+          { text: "b) Lo acepto con algo de resistencia.", score: 2 },
+          { text: "c) Me ajusto rápidamente y busco soluciones.", score: 3 }
+        ]
+      },
+      {
+        text: "2. ¿Te resulta fácil explicar tus ideas a otras personas?",
+        options: [
+          { text: "a) No, suelo enredarme.", score: 1 },
+          { text: "b) A veces, según el tema.", score: 2 },
+          { text: "c) Sí, me comunico con claridad.", score: 3 }
+        ]
+      },
+      {
+        text: "3. ¿Sueles cuestionar lo que se te presenta o sigues instrucciones sin pensar mucho?",
+        options: [
+          { text: "a) Prefiero seguir lo establecido.", score: 1 },
+          { text: "b) Depende del caso.", score: 2 },
+          { text: "c) Me gusta analizar y proponer mejoras.", score: 3 }
+        ]
+      },
+      {
+        text: "4. En los trabajos grupales tú…",
+        options: [
+          { text: "a) Prefiero trabajar solo/a.", score: 1 },
+          { text: "b) Participo si es necesario.", score: 2 },
+          { text: "c) Me involucro activamente.", score: 3 }
+        ]
+      },
+      {
+        text: "5. Cuando recibes una crítica…",
+        options: [
+          { text: "a) Me afecta bastante.", score: 1 },
+          { text: "b) La escucho, pero me cuesta aceptarla.", score: 2 },
+          { text: "c) La valoro como una oportunidad para mejorar.", score: 3 }
+        ]
+      },
+      {
+        text: "6. ¿Qué tan bien manejas herramientas digitales?",
+        options: [
+          { text: "a) Me cuesta bastante.", score: 1 },
+          { text: "b) Me defiendo, pero aún tengo mucho por aprender.", score: 2 },
+          { text: "c) Las uso con naturalidad.", score: 3 }
+        ]
+      },
+      {
+        text: "7. ¿Con qué frecuencia propones ideas nuevas en el trabajo?",
+        options: [
+          { text: "a) Casi nunca.", score: 1 },
+          { text: "b) De vez en cuando.", score: 2 },
+          { text: "c) Con frecuencia.", score: 3 }
+        ]
+      },
+      {
+        text: "8. ¿Cómo organizas tu jornada laboral?",
+        options: [
+          { text: "a) Voy improvisando.", score: 1 },
+          { text: "b) Tengo una idea general.", score: 2 },
+          { text: "c) Uso listas o herramientas de organización.", score: 3 }
+        ]
+      },
+      {
+        text: "9. ¿Cuándo fue la última vez que aprendiste algo nuevo por iniciativa propia?",
+        options: [
+          { text: "a) Hace más de un año.", score: 1 },
+          { text: "b) Hace algunos meses.", score: 2 },
+          { text: "c) En las últimas semanas.", score: 3 }
+        ]
+      },
+      {
+        text: "10. ¿Te consideras una persona autónoma y responsable en el trabajo?",
+        options: [
+          { text: "a) Necesito supervisión constante.", score: 1 },
+          { text: "b) Me manejo bastante bien.", score: 2 },
+          { text: "c) Soy completamente autónomo/a.", score: 3 }
+        ]
+      }
+    ];
+
+    const quizContainer = document.getElementById("quiz");
+
+    questions.forEach((q, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "question";
+      qDiv.innerHTML = `<strong>${q.text}</strong>`;
+      q.options.forEach((opt, j) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt.text;
+        btn.onclick = () => {
+          qDiv.querySelectorAll("button").forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+          btn.setAttribute("data-score", opt.score);
+        };
+        qDiv.appendChild(btn);
+      });
+      quizContainer.appendChild(qDiv);
+    });
+
+    function showResult() {
+      let total = 0;
+      document.querySelectorAll(".question").forEach(q => {
+        const selected = q.querySelector(".selected");
+        if (selected) {
+          total += parseInt(selected.getAttribute("data-score"));
+        }
+      });
+
+      const resultDiv = document.getElementById("result");
+      let message = "";
+      if (total <= 15) {
+        message = "🔍 Tu fortaleza actual necesita desarrollo. Podés trabajar tu adaptabilidad, iniciativa y comunicación.";
+      } else if (total <= 24) {
+        message = "💡 Tienes un perfil en crecimiento. Ya tenés buenas bases y con algo más de práctica, podés destacar aún más.";
+      } else {
+        message = "🚀 ¡Sos una persona muy preparada para los desafíos laborales actuales! Tu autonomía, proactividad y pensamiento crítico se notan.";
+      }
+
+      resultDiv.innerHTML = `<strong>Resultado:</strong> Obtuviste ${total} puntos.<br>${message}`;
+      resultDiv.style.display = "block";
+    }
+  </script>
+</body>
+</html>
